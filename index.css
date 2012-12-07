@@ -1,0 +1,18 @@
+#mainbox {
+  width: 710px;
+}
+
+#leftbox {
+  width: 350px;
+  float: left;
+}
+
+#rightbox {
+  width: 350px;
+  float: right;
+}
+
+#input {
+  width:  300px;
+  height: 400px;
+}

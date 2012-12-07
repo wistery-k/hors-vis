@@ -1,9 +1,37 @@
 <html>
 <head>
+  <title>HORS Visualizer</title>
+  <link rel="stylesheet" href="index.css" type="text/css" />
 </head>
 <body>
-  Hello!!!
-  <canvas id="canvas"/>
+  <h1>HORS Visualizer</h1>
+  <div id="mainbox">
+    <div id="leftbox">
+      <textarea id="input">
+S -> (Newr C1)
+C1 x -> (Neww (C2 x))
+C2 x y -> (F x y end)
+F x y k -> (br (Close x (Close y k)) (Read x (Write y (F x y k))))
+I x y -> (x y)
+K x y -> y
+Newr k -> (br (newr (k I)) (k K))
+Neww k -> (br (neww (k I)) (k K))
+Close x k -> (x Close' k)
+Read x k -> (x Read' k)
+Write y k -> (y Write' k)
+Close' k -> (close k)
+Read'  k -> (read  k)
+Write' k -> (write k)
+      </textarea>
+      <button id="parseButton">parse</button>
+      <button id="expandButton">expand</button>
+      <button id="clearButton">clear</button>
+    </div>
+    <div id="rightbox">
+      <canvas id="canvas" width="600px" height="600px"/>
+    </div>
+  </div>
+
   <script src="main.js"></script>
 </body>
 </html>

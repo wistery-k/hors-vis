@@ -1,7 +1,8 @@
 .PHONY: start
 
-main.js: main.coffee
-	coffee -cb main.coffee
-start:
-	coffee -cbw main.coffee &
-	guard
+SOURCES = wistery.coffee base.coffee parser.coffee main.coffee 
+
+main.js: $(SOURCES)
+	coffee -cbj main.js $(SOURCES)
+watch:
+	coffee -cbwj main.js $(SOURCES)
