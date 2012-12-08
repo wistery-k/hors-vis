@@ -2,7 +2,8 @@ console.log("main.coffee entry point")
 
 g = canvas.getContext("2d")
 g.font = "bold 20pt Times New Roman"
-g.fillStyle = 'rgb(192, 80, 77)'
+
+# show :: Term -> String
 
 show = (term) -> term.match(
   (label, children) ->
@@ -15,6 +16,8 @@ show = (term) -> term.match(
   (id) -> id
   (id, body) -> "(\\" + id + "." + show(body) + ")",
   (t1, t2) -> "(" + show(t1) + " " + show(t2) + ")")
+
+# substitute ::: Term -> Term -> Term
 
 substitute = (t1, t2) ->
   substitute_ = (id, t2) -> (t1) ->
@@ -34,13 +37,17 @@ substitute = (t1, t2) ->
     (id, body) -> substitute_(id, t2)(body),
     (_, _) -> throw "unable to substitute.")
 
-termToNode = (term) ->
+# termToTree :: Term -> Tree
+
+termToTree = (term) ->
   term.match(
-    (label, children) -> new Node(label, children.map(termToNode)),
+    (label, children) -> new Node(label, children.map(termToTree)),
     (sym) -> new Leaf(new Fs(sym)),
     (id) -> new Leaf(new Id(id)),
     (id, body) -> new Leaf(new Abs(id, body)),
     (t1, t2) -> new Leaf(new App(t1, t2)))
+
+# evalTerm :: Hors#bodies -> Term -> Term
 
 evalTerm = (bodies) -> (term) ->
   term.match(
@@ -51,10 +58,12 @@ evalTerm = (bodies) -> (term) ->
     (t1, t2) ->
       substitute(evalTerm(bodies)(t1), t2))
 
+# expandTree :: Hors#bodies -> Tree -> Tree
+
 expandTree = (bodies) -> (tree) ->
   tree.match(
     (label, children) -> new Node(label, children.map(expandTree(bodies))),
-    (term) -> termToNode(evalTerm(bodies)(term)))
+    (term) -> termToTree(evalTerm(bodies)(term)))
 
 width = (tree) ->
   tree.match(
@@ -88,11 +97,15 @@ drawTree = (tree) ->
           g.closePath()
           g.stroke()
         m = g.measureText(label)
+        g.fillStyle = 'rgb(192, 80, 77)'
         g.fillText(label, xx - m.width / 2, yy)
       ,
       (term) ->
-        str = show(term)[0..10]
+        str = show(term)
+        if str.length > 10
+          str = str[0..7] + "..."
         m = g.measureText(str)
+        g.fillStyle = 'rgb(80, 77, 192)'
         g.fillText(str, xx - m.width / 2, yy))
     [xx, yy]
   g.clearRect(0, 0, canvas.width, canvas.height)
@@ -106,7 +119,7 @@ clearRef = (e) ->
   treeRef = null
   g.clearRect(0, 0, canvas.width, canvas.height)
 
-expandClickedLeaf = (e) ->
+expandRoot = (e) ->
   return unless horsRef && treeRef
   try
     treeRef = expandTree(horsRef.bodies)(treeRef)
@@ -134,7 +147,7 @@ readAndInit = (e) ->
 
 main = () ->
   parseButton.addEventListener("click", readAndInit, false)
-  expandButton.addEventListener("click", expandClickedLeaf, false)
+  expandButton.addEventListener("click", expandRoot, false)
   clearButton.addEventListener("click", clearRef, false)
 
 main()
